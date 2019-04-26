@@ -26,7 +26,7 @@ class MainMenuScreen : KtxScreen {
 
             add(TextButton("New Game", textButtonStyle).apply {
                 onClick {
-                    Main.setScreen(GameScreen())
+                    Main.setScreen(GameScreen(), 0.25f, Color.WHITE)
                 }
             })
         })
