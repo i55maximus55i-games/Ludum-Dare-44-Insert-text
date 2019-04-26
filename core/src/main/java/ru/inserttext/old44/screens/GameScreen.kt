@@ -1,4 +1,4 @@
-package ru.inserttext.old44
+package ru.inserttext.old44.screens
 
 import ktx.app.KtxScreen
 import ktx.app.clearScreen

@@ -2,6 +2,8 @@ package ru.inserttext.old44
 
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.Screen
+import ru.inserttext.old44.controls.Controls
+import ru.inserttext.old44.screens.MainMenuScreen
 
 class Main(private val isDebug : Boolean) : Game() {
 

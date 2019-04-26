@@ -1,4 +1,4 @@
-package ru.inserttext.old44
+package ru.inserttext.old44.controls
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
