@@ -35,7 +35,10 @@ class EnemyShooter(val world: World, position: Vector2, scale: Float) : Enemy(wo
             textureRegion.texture = texture
             textureRegion.setRegion(0, 0, 64, 64)
 
-            if (hitEffect < 0 || hitEffect % 0.1f > 0.05f) {
+            if (hp <= 0) {
+                textureRegion.setRegion(0, 128, 64, 64)
+                batch.draw(textureRegion, body.position.x / scale - textureRegion.regionWidth / 2, body.position.y / scale - textureRegion.regionHeight / 2)
+            } else if (hitEffect < 0 || hitEffect % 0.1f > 0.05f) {
                 if (animShootTimer <= animShootDuration) {
                     val t = (animShootTimer / (animShootDuration / 4)).toInt() + 2
                     textureRegion.setRegion(64 * t, 64 * (2 - hp), 64, 64)
@@ -49,23 +52,28 @@ class EnemyShooter(val world: World, position: Vector2, scale: Float) : Enemy(wo
     }
 
     override fun update(delta: Float, player: Player) {
-        shootTimer -= delta
-        animTimer += delta
-        animTimer %= animDuration
-        animShootTimer += delta
-        hitEffect -= delta
+        if (hp > 0) {
+            shootTimer -= delta
+            animTimer += delta
+            animTimer %= animDuration
+            animShootTimer += delta
+            hitEffect -= delta
 
-        if (body.position.dst(player.body.position) >= distanceMax) {
-            body.linearVelocity = player.body.position.sub(body.position).setLength(MathUtils.random(speedMin, speedMax))
-            shootTimer = MathUtils.random(deltaShootMin, deltaShootMax)
+            if (body.position.dst(player.body.position) >= distanceMax) {
+                body.linearVelocity = player.body.position.sub(body.position).setLength(MathUtils.random(speedMin, speedMax))
+                shootTimer = MathUtils.random(deltaShootMin, deltaShootMax)
+            }
+            if (body.position.dst(player.body.position) <= distanceMin) {
+                body.linearVelocity = body.position.sub(player.body.position).setLength(MathUtils.random(speedMin, speedMax))
+            }
+            if (shootTimer <= 0) {
+                shootTimer = MathUtils.random(deltaShootMin, deltaShootMax)
+                shoot(player)
+                animShootTimer = 0f
+            }
         }
-        if (body.position.dst(player.body.position) <= distanceMin) {
-            body.linearVelocity = body.position.sub(player.body.position).setLength(MathUtils.random(speedMin, speedMax))
-        }
-        if (shootTimer <= 0) {
-            shootTimer = MathUtils.random(deltaShootMin, deltaShootMax)
-            shoot(player)
-            animShootTimer = 0f
+        else {
+            body.linearVelocity = Vector2.Zero
         }
     }
 

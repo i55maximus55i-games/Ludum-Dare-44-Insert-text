@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import ru.inserttext.old44.controls.Controls
 import ru.inserttext.old44.screens.MainMenuScreen
+import ru.inserttext.old44.screens.SlotMachineScreen
 
 class Main(private val isDebug : Boolean) : Game() {
 

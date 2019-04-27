@@ -31,7 +31,7 @@ class IntroWorkScreen(val l: Int) : KtxScreen {
             center()
 
             add(Label("Вы ничего не заработали", labelStyle)).pad(32f).row()
-            add(TextButton("Ок", textButtonStyle).apply {
+            add(TextButton(">Ок", textButtonStyle).apply {
                 onClick {
                     if (l <= 1) {
                         Main.setScreen(IntroWorkGameOverScreen(), 0.25f, Color.WHITE)
@@ -55,6 +55,14 @@ class IntroWorkScreen(val l: Int) : KtxScreen {
             act()
             draw()
         }
+
+        if (Main.controls.menuEnter())
+            if (l <= 1) {
+                Main.setScreen(IntroWorkGameOverScreen(), 0.25f, Color.WHITE)
+            }
+            else {
+                Main.setScreen(IntroScreen(l - 1), 0.25f, Color.WHITE)
+            }
     }
 
     override fun resize(width: Int, height: Int) {

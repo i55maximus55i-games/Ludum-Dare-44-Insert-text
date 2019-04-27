@@ -1,11 +1,11 @@
 package ru.inserttext.old44.screens
 
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Input
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils
+import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.utils.viewport.FitViewport
 import ktx.app.KtxScreen
 import ktx.app.clearScreen
@@ -15,10 +15,41 @@ import ru.inserttext.old44.Main
 class SlotMachineScreen : KtxScreen {
 
     val batch = SpriteBatch()
-    val shapeRenderer = ShapeRenderer()
     val camera = OrthographicCamera()
 
     val viewport = FitViewport(1024f, 768f, camera)
+
+    var change = false
+
+    val betList = ArrayList<Int>().apply {
+        add(10)
+        add(50)
+        add(100)
+        add(200)
+        add(500)
+        add(1000)
+        add(2000)
+        add(5000)
+    }
+    var bet = 2
+    var score = 0
+    val goal = 15000
+    val min = -2500
+
+    val labelStyle = Label.LabelStyle().apply {
+        font = Main.assets.font24
+        fontColor = Color.WHITE
+    }
+    val labelScore = Label("score = $score", labelStyle).apply {
+        setPosition(0f, 0f)
+    }
+    val labelBet = Label("bet = ${betList[bet]}", labelStyle).apply {
+        setPosition(0f, 32f)
+    }
+    val stage = Stage(viewport).apply {
+        addActor(labelBet)
+        addActor(labelScore)
+    }
 
     val texture = Main.assets.getTexture("slots.png")
     val textureMachine = Main.assets.getTexture("m.png")
@@ -31,28 +62,28 @@ class SlotMachineScreen : KtxScreen {
     var r1 = 0
     var r2 = 1
     var r3 = 2
-    val r2Chance = 0.6f
+    val r2Chance = 0.5f
     val r3Chance = 0.8f
 
     override fun show() {
-//        var c = 0
-//        val n = 1000
-//        for (i in 0 .. n) {
-//            r1 = MathUtils.random(0, 2)
-//            r2 = if (MathUtils.random(0f, 1f) > r2Chance) {
-//                MathUtils.random(0, 2)
-//            } else {
-//                r1
-//            }
-//            r3 = if (MathUtils.random(0f, 1f) > r3Chance) {
-//                MathUtils.random(0, 2)
-//            } else {
-//                r2
-//            }
-//            if (r1 == r2 && r2 == r3)
-//                c++
-//        }
-//        println(c.toFloat() / n.toFloat())
+        var c = 0
+        val n = 1000
+        for (i in 0 .. n) {
+            r1 = MathUtils.random(0, 2)
+            r2 = if (MathUtils.random(0f, 1f) > r2Chance) {
+                MathUtils.random(0, 2)
+            } else {
+                r1
+            }
+            r3 = if (MathUtils.random(0f, 1f) > r3Chance) {
+                MathUtils.random(0, 2)
+            } else {
+                r2
+            }
+            if (r1 == r2 && r2 == r3)
+                c++
+        }
+        println(c.toFloat() / n.toFloat())
     }
 
     override fun render(delta: Float) {
@@ -60,6 +91,10 @@ class SlotMachineScreen : KtxScreen {
 
         update(delta)
         draw()
+        stage.apply {
+            act()
+            draw()
+        }
     }
 
     override fun resize(width: Int, height: Int) {
@@ -132,6 +167,13 @@ class SlotMachineScreen : KtxScreen {
                     i = -1
                     slotpos3 = 32f + r3 * 64f
                     slotTimer = 0.5f
+
+                    if (r1 == r2 && r2 == r3) {
+                        score += betList[bet] * 2
+                    } else {
+                        score -= betList[bet]
+                    }
+                    labelScore.setText("score = $score")
                 }
                 else {
                     slotpos3 += delta * 512
@@ -140,27 +182,51 @@ class SlotMachineScreen : KtxScreen {
             }
         }
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && i == -1) {
-            i = 0
-            slotTimer = 1f
-
-            r1 = MathUtils.random(0, 2)
-            r2 = if (MathUtils.random(0f, 1f) > r2Chance) {
-                MathUtils.random(0, 2)
-            } else {
-                r1
+        if (i == -1) {
+            if (Main.controls.up()) {
+                bet++
+                if (bet >= betList.size)
+                    bet = betList.lastIndex
             }
-            r3 = if (MathUtils.random(0f, 1f) > r3Chance) {
-                MathUtils.random(0, 2)
-            } else {
-                r2
+            if (Main.controls.down()) {
+                bet--
+                if (bet < 0)
+                    bet = 0
+            }
+            labelBet.setText("bet = ${betList[bet]}")
+
+            if (Main.controls.menuEnter()) {
+                i = 0
+                slotTimer = 1f
+
+                r1 = MathUtils.random(0, 2)
+                r2 = if (MathUtils.random(0f, 1f) > r2Chance) {
+                    MathUtils.random(0, 2)
+                } else {
+                    r1
+                }
+                r3 = if (MathUtils.random(0f, 1f) > r3Chance) {
+                    MathUtils.random(0, 2)
+                } else {
+                    r2
+                }
+            }
+        }
+
+        if (!change) {
+            if (score < min) {
+                Main.setScreen(CasinoLoseScreen(), 0.25f, Color.WHITE)
+                change = true
+            }
+            if (score > goal) {
+                Main.setScreen(CasinoWinScreen(), 0.25f, Color.WHITE)
+                change = true
             }
         }
     }
 
     fun draw() {
         batch.projectionMatrix = camera.combined
-        shapeRenderer.projectionMatrix = camera.combined
         batch.use {
             batch.draw(texture, 338f, slotpos1 + 412)
             batch.draw(texture, 338f, slotpos1 - 192 + 412)

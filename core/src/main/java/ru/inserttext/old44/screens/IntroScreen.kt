@@ -14,33 +14,39 @@ import ru.inserttext.old44.Main
 
 class IntroScreen(val l: Int) : KtxScreen {
 
+    var a = false
+
+    val labelStyle = Label.LabelStyle().apply {
+        font = Main.assets.font24
+        fontColor = Color.WHITE
+    }
+
+    val textButtonStyle = TextButton.TextButtonStyle().apply {
+        font = Main.assets.font24
+        fontColor = Color.WHITE
+    }
+
+
+    val workButton = TextButton(">Пойти работать", textButtonStyle).apply {
+        onClick {
+            Main.setScreen(IntroWorkScreen(l), 0.25f, Color.WHITE)
+        }
+    }
+    val casinoButton = TextButton("Пойти в казино", textButtonStyle).apply {
+        onClick {
+            Main.setScreen(SlotMachineScreen(), 0.25f, Color.WHITE)
+        }
+    }
+
     val stage = Stage(ScreenViewport()).apply {
-
-        val labelStyle = Label.LabelStyle().apply {
-            font = Main.assets.font24
-            fontColor = Color.WHITE
-        }
-
-        val textButtonStyle = TextButton.TextButtonStyle().apply {
-            font = Main.assets.font24
-            fontColor = Color.WHITE
-        }
 
         addActor(Table().apply {
             setFillParent(true)
             center()
 
-            add(Label("Вам нужно заработать деньги на жизнь", labelStyle)).pad(32f).row()
-            add(TextButton("Пойти работать", textButtonStyle).apply {
-                onClick {
-                    Main.setScreen(IntroWorkScreen(l), 0.25f, Color.WHITE)
-                }
-            }).row()
-            add(TextButton("Пойти в казино", textButtonStyle).apply {
-                onClick {
-                    Main.setScreen(SlotMachineScreen(), 0.25f, Color.WHITE)
-                }
-            })
+            add(Label("Вам нужно заработать\nденьги на жизнь", labelStyle)).pad(48f).row()
+            add(workButton).pad(8f).row()
+            add(casinoButton)
         })
     }
 
@@ -54,6 +60,23 @@ class IntroScreen(val l: Int) : KtxScreen {
         stage.apply {
             act()
             draw()
+        }
+        if (Main.controls.up() || Main.controls.down()) {
+            a = !a
+            if (a) {
+                workButton.setText("Пойти работать")
+                casinoButton.setText(">Пойти в казино")
+            } else {
+                workButton.setText(">Пойти работать")
+                casinoButton.setText("Пойти в казино")
+            }
+        }
+        if (Main.controls.menuEnter()) {
+            if (a) {
+                Main.setScreen(SlotMachineScreen(), 0.25f, Color.WHITE)
+            } else {
+                Main.setScreen(IntroWorkScreen(l), 0.25f, Color.WHITE)
+            }
         }
     }
 

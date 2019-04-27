@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Vector2
 class Controls {
 
     val gamepads = ArrayList<GamePad>()
+    var isGamePad = false
 
     init {
         for (controller in Controllers.getControllers()) {
@@ -19,6 +20,8 @@ class Controls {
     fun update() {
         for (gamepad in gamepads)
             gamepad.update()
+        if (Gdx.input.isKeyPressed(Input.Keys.ANY_KEY) || Gdx.input.isKeyJustPressed(Input.Keys.ANY_KEY) || Gdx.input.deltaX != 0 || Gdx.input.deltaY != 0)
+            isGamePad = false
     }
 
     fun start(): Boolean {
@@ -59,33 +62,39 @@ class Controls {
         return Vector2(x, y).clamp(0f, 1f)
     }
 
-    fun playerRun(): Boolean {
+    fun up(): Boolean {
         var t = false
-        if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT))
+        if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
             t = true
-        for (i in gamepads)
-            if (i.isButtonPressed(XboxMapping.L_BUMPER))
+        }
+        for (i in gamepads) {
+            if (i.povUp)
                 t = true
+        }
         return t
     }
 
-    fun playerJump(): Boolean {
+    fun down(): Boolean {
         var t = false
-        if (Gdx.input.isKeyPressed(Input.Keys.SPACE))
+        if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
             t = true
-        for (i in gamepads)
-            if (i.isButtonPressed(XboxMapping.A))
+        }
+        for (i in gamepads) {
+            if (i.povDown)
                 t = true
+        }
         return t
     }
 
-    fun attack(): Boolean {
+    fun menuEnter(): Boolean {
         var t = false
-        if (Gdx.input.isKeyJustPressed(Input.Keys.F))
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
             t = true
-        for (i in gamepads)
-            if (i.isButtonJustPressed(XboxMapping.X))
+        }
+        for (i in gamepads) {
+            if (i.isButtonJustPressed(XboxMapping.A))
                 t = true
+        }
         return t
     }
 
