@@ -3,6 +3,7 @@ package ru.inserttext.old44.controls
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.controllers.Controllers
+import com.badlogic.gdx.math.Vector2
 
 class Controls {
 
@@ -30,8 +31,10 @@ class Controls {
         return t
     }
 
-    fun playerMove(): Float {
+    fun playerMove(): Vector2 {
         var x = 0f
+        var y = 0f
+
         if (Gdx.input.isKeyPressed(Input.Keys.A))
             x -= 1f
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
@@ -40,11 +43,20 @@ class Controls {
             x += 1f
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT))
             x += 1f
-        for (i in gamepads)
+        if (Gdx.input.isKeyPressed(Input.Keys.W))
+            y += 1f
+        if (Gdx.input.isKeyPressed(Input.Keys.UP))
+            y += 1f
+        if (Gdx.input.isKeyPressed(Input.Keys.S))
+            y -= 1f
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN))
+            y -= 1f
+
+        for (i in gamepads) {
             x += i.axis(XboxMapping.L_STICK_HORIZONTAL_AXIS)
-        if (Math.abs(x) > 1f)
-            x = if (x < 0f) -1f else 1f
-        return x
+            y -= i.axis(XboxMapping.L_STICK_VERTICAL_AXIS)
+        }
+        return Vector2(x, y).clamp(0f, 1f)
     }
 
     fun playerRun(): Boolean {

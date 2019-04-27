@@ -5,6 +5,8 @@ import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
+import com.badlogic.gdx.maps.tiled.TiledMap
+import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.utils.Disposable
 
 class Assets : Disposable {
@@ -15,6 +17,7 @@ class Assets : Disposable {
     private val textures = HashMap<String, Texture>()
     private val sounds = HashMap<String, Sound>()
     private val musics = HashMap<String, Music>()
+    private val maps = HashMap<String, TiledMap>()
 
     fun getTexture(name: String) : Texture? {
         if (textures.containsKey(name))
@@ -46,6 +49,16 @@ class Assets : Disposable {
         return null
     }
 
+    fun getMap(name: String) : TiledMap? {
+        if (maps.containsKey(name))
+            return maps[name]
+        if (Gdx.files.internal("maps/$name").exists()) {
+            maps[name] = TmxMapLoader().load("maps/$name")
+            return maps[name]
+        }
+        return null
+    }
+
     override fun dispose() {
         font24.dispose()
         font32.dispose()
@@ -56,6 +69,9 @@ class Assets : Disposable {
             i.value.dispose()
         }
         for (i in musics) {
+            i.value.dispose()
+        }
+        for (i in maps) {
             i.value.dispose()
         }
     }

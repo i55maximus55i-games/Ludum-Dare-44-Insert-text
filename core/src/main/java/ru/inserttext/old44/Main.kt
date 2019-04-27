@@ -23,7 +23,8 @@ class Main(private val isDebug : Boolean) : Game() {
         private lateinit var instance: Main
         lateinit var assets: Assets
         lateinit var controls: Controls
-        var debug = false
+        var debug = true
+        const val scale = 1 / 64f
 
         fun blink(time: Float, color: Color) {
             instance.blink(time, color)
