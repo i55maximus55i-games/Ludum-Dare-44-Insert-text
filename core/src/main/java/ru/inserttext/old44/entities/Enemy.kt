@@ -6,7 +6,7 @@ import com.badlogic.gdx.physics.box2d.*
 import ru.inserttext.old44.Main
 
 open class Enemy(world: World, position: Vector2, val scale: Float) {
-    private val size = 64
+    val size = 64
     val body : Body
 
     init {

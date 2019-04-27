@@ -1,6 +1,7 @@
 package ru.inserttext.old44.entities
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.*
 import ru.inserttext.old44.Main
@@ -9,8 +10,12 @@ class Player(world: World, position: Vector2, val scale: Float) {
 
     private val size = 64
     private val speed = 5f
-    val texture = Main.assets.getTexture("player.png")
     val body : Body
+
+    val texture = Main.assets.getTexture("player.png")
+    val textureRegion = TextureRegion()
+    var animDuration = 0.4f
+    var animTimer = 0f
 
     init {
         val bDef = BodyDef()

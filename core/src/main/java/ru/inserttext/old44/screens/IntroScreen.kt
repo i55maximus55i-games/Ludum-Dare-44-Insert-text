@@ -3,6 +3,7 @@ package ru.inserttext.old44.screens
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.utils.viewport.ScreenViewport
@@ -11,9 +12,14 @@ import ktx.app.KtxScreen
 import ktx.app.clearScreen
 import ru.inserttext.old44.Main
 
-class MainMenuScreen : KtxScreen {
+class IntroScreen(val l: Int) : KtxScreen {
 
     val stage = Stage(ScreenViewport()).apply {
+
+        val labelStyle = Label.LabelStyle().apply {
+            font = Main.assets.font24
+            fontColor = Color.WHITE
+        }
 
         val textButtonStyle = TextButton.TextButtonStyle().apply {
             font = Main.assets.font24
@@ -24,9 +30,15 @@ class MainMenuScreen : KtxScreen {
             setFillParent(true)
             center()
 
-            add(TextButton("New Game", textButtonStyle).apply {
+            add(Label("Вам нужно заработать деньги на жизнь", labelStyle)).pad(32f).row()
+            add(TextButton("Пойти работать", textButtonStyle).apply {
                 onClick {
-                    Main.setScreen(IntroScreen(3), 0.25f, Color.WHITE)
+                    Main.setScreen(IntroWorkScreen(l), 0.25f, Color.WHITE)
+                }
+            }).row()
+            add(TextButton("Пойти в казино", textButtonStyle).apply {
+                onClick {
+                    Main.setScreen(SlotMachineScreen(), 0.25f, Color.WHITE)
                 }
             })
         })

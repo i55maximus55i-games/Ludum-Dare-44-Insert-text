@@ -10,8 +10,10 @@ import com.badlogic.gdx.physics.box2d.*
 import ktx.app.KtxScreen
 import ktx.app.clearScreen
 import ktx.app.use
+import ru.inserttext.old44.ContactHandler
 import ru.inserttext.old44.Main
 import ru.inserttext.old44.Main.Companion.scale
+import ru.inserttext.old44.entities.EnemyClose
 import ru.inserttext.old44.entities.EnemyShooter
 import ru.inserttext.old44.entities.Player
 
@@ -27,9 +29,10 @@ class GameScreen : KtxScreen {
 
 
     lateinit var player : Player
-    var enemyShooter = EnemyShooter(world, Vector2(0f, 0f), Main.scale)
+    var enemyShooter = EnemyShooter(world, Vector2(32f, 32f), Main.scale)
 
     override fun show() {
+        world.setContactListener(ContactHandler())
         camera.apply {
             setToOrtho(false)
             update()
@@ -47,7 +50,7 @@ class GameScreen : KtxScreen {
 
     override fun resize(width: Int, height: Int) {
         camera.apply {
-            val a = 1200f
+            val a = 680f
             viewportWidth = a * width / height
             viewportHeight = a
             update()
