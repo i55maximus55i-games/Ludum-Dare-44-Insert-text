@@ -1,26 +1,56 @@
 package ru.inserttext.old44.screens
 
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.maps.objects.RectangleMapObject
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.*
+import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.ui.Label
+import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.utils.viewport.ScreenViewport
 import ktx.app.KtxScreen
 import ktx.app.clearScreen
 import ktx.app.use
 import ru.inserttext.old44.ContactHandler
 import ru.inserttext.old44.Main
 import ru.inserttext.old44.Main.Companion.scale
-import ru.inserttext.old44.entities.Bullet
-import ru.inserttext.old44.entities.Enemy
-import ru.inserttext.old44.entities.EnemyShooter
-import ru.inserttext.old44.entities.Player
+import ru.inserttext.old44.entities.*
 
-class GameScreen(val shoot: Boolean) : KtxScreen {
+class GameScreen(val shoot: Boolean, val score: Int) : KtxScreen {
+
+    companion object {
+        var sc = 0
+    }
+
+    var changeScreenTimer = 0.75f
+    var isChangeScreen = false
 
     val batch = SpriteBatch()
+    var batch2 = SpriteBatch()
     val camera = OrthographicCamera()
+
+    val labelStyle = Label.LabelStyle().apply {
+        font = Main.assets.font24
+        fontColor = Color.WHITE
+    }
+
+    val scoreLabel = Label("Score = $score", labelStyle)
+
+    val stage = Stage(ScreenViewport()).apply {
+
+        addActor(Table().apply {
+            setFillParent(true)
+            top()
+            left()
+
+            add(scoreLabel).pad(16f)
+        })
+    }
 
     val background = Main.assets.getTexture("plitka.png")
     val map = Main.assets.getMap("map1.tmx")
@@ -30,6 +60,13 @@ class GameScreen(val shoot: Boolean) : KtxScreen {
 
     val bulletList = ArrayList<Bullet>()
     val enemyList = ArrayList<Enemy>()
+
+    val hp = Main.assets.getTexture("hp.png")
+    val hpR = TextureRegion(hp)
+    var a = 0f
+
+    var spawnTimer = 6f
+    var spawnId = 0
 
     lateinit var player : Player
 
@@ -43,6 +80,10 @@ class GameScreen(val shoot: Boolean) : KtxScreen {
         }
         player = Player(world, getPlayerStartPos(),  Main.scale, shoot, bulletList, enemyList)
         createWalls()
+
+        Gdx.input.inputProcessor = stage
+
+        sc = score
     }
 
     override fun render(delta: Float) {
@@ -59,6 +100,11 @@ class GameScreen(val shoot: Boolean) : KtxScreen {
             viewportHeight = a
             update()
         }
+
+        batch2.dispose()
+        batch2 = SpriteBatch()
+
+        stage.viewport.update(width, height, true)
     }
 
     override fun pause() {
@@ -70,14 +116,31 @@ class GameScreen(val shoot: Boolean) : KtxScreen {
     }
 
     override fun hide() {
-
+        dispose()
     }
 
     override fun dispose() {
-
+        stage.dispose()
     }
 
     fun update(delta: Float) {
+        a += delta
+        spawnTimer += delta
+
+        if (spawnTimer > 6f) {
+            spawnTimer = 0f
+
+            for (i in map!!.layers.get("spawn").objects.getByType(RectangleMapObject::class.java)) {
+                val rect = i.rectangle
+                val vector2 = Vector2(rect.x, rect.y)
+                spawnId++
+                if (spawnId % 2 == 0)
+                    enemyList.add(EnemyShooter(world, vector2, Main.scale, bulletList))
+                else
+                    enemyList.add(EnemyClose(world, vector2, Main.scale))
+            }
+        }
+
         player.update(delta)
         for (i in enemyList)
             i.update(delta, player)
@@ -90,6 +153,22 @@ class GameScreen(val shoot: Boolean) : KtxScreen {
             camera.position.y = player.body.position.y / scale
             camera.update()
         }
+
+        if (changeScreenTimer <= 0f) {
+            changeScreenTimer = 9999f
+            if (sc >= 0) {
+                Main.setScreen(ArenaWinScreen(), 0.24f, Color.WHITE)
+                isChangeScreen = true
+            }
+
+            else if (player.hp <= 0) {
+                Main.setScreen(ArenaLoseScreen(), 0.24f, Color.WHITE)
+                isChangeScreen = true
+            }
+        }
+        if (sc >= 0 || player.hp <= 0) {
+            changeScreenTimer -= delta
+        }
     }
 
     fun draw() {
@@ -101,8 +180,24 @@ class GameScreen(val shoot: Boolean) : KtxScreen {
             for (i in enemyList)
                 i.draw(batch)
             player.draw(batch)
+        }
+
+        orthogonalTiledMapRenderer.setView(camera)
+        orthogonalTiledMapRenderer.render()
+
+        batch.use {
             for (i in bulletList)
                 i.draw(batch)
+        }
+
+        batch2.use {
+            val t = 4 - player.hp
+            when {
+                player.hp > 0 -> hpR.setRegion(64 * t, 0, 64, 64)
+                a % 1f > 0.5f -> hpR.setRegion(64 * 4, 0, 64, 64)
+                else -> hpR.setRegion(64 * 5, 0, 64, 64)
+            }
+            batch2.draw(hpR, 16f, (Gdx.graphics.height - hpR.regionHeight * 2).toFloat(), 128f, 128f)
         }
 
         if (Main.debug) {
@@ -117,9 +212,11 @@ class GameScreen(val shoot: Boolean) : KtxScreen {
             camera.update()
         }
 
-        //TODO включить стены
-//        orthogonalTiledMapRenderer.setView(camera)
-//        orthogonalTiledMapRenderer.render()
+        scoreLabel.setText("Score = $sc")
+        stage.apply {
+            act()
+            draw()
+        }
     }
 
     fun createWalls() {

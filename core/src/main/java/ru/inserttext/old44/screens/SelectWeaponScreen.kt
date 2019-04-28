@@ -29,12 +29,12 @@ class SelectWeaponScreen(val score: Int) : KtxScreen {
 
     val workButton = TextButton(">Дробовик", textButtonStyle).apply {
         onClick {
-            Main.setScreen(GameScreen(true), 0.25f, Color.WHITE)
+            Main.setScreen(GameScreen(true, score), 0.25f, Color.WHITE)
         }
     }
     val casinoButton = TextButton("Фламинго", textButtonStyle).apply {
         onClick {
-            Main.setScreen(GameScreen(false), 0.25f, Color.WHITE)
+            Main.setScreen(GameScreen(false, score), 0.25f, Color.WHITE)
         }
     }
 
@@ -73,9 +73,9 @@ class SelectWeaponScreen(val score: Int) : KtxScreen {
         }
         if (Main.controls.menuEnter()) {
             if (a) {
-                Main.setScreen(GameScreen(false), 0.25f, Color.WHITE)
+                Main.setScreen(GameScreen(false, score), 0.25f, Color.WHITE)
             } else {
-                Main.setScreen(GameScreen(true), 0.25f, Color.WHITE)
+                Main.setScreen(GameScreen(true, score), 0.25f, Color.WHITE)
             }
         }
     }

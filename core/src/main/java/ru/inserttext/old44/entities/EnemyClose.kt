@@ -74,7 +74,7 @@ class EnemyClose(val world: World, position: Vector2, scale: Float) : Enemy(worl
             if (body.position.dst(player.body.position) <= attackDst) {
                 goBackTimer = gobackDuration
                 attackAnimTimer = 0f
-                attatck()
+                attatck(player)
             }
         }
         else {
@@ -82,8 +82,12 @@ class EnemyClose(val world: World, position: Vector2, scale: Float) : Enemy(worl
         }
     }
 
-    fun attatck() {
-
+    fun attatck(player: Player) {
+        Main.assets.getSound("hit.wav")!!.play()
+        if (player.hp > 0 && player.hitEffect <= 0f) {
+            player.hp--
+            player.hitEffect = 0.5f
+        }
     }
 
 }

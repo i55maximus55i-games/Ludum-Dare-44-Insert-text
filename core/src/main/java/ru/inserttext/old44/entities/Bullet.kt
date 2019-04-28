@@ -41,6 +41,7 @@ class Bullet(val world: World, val pos: Vector2, val dir: Vector2, val size: Flo
     fun update(delta: Float) {
         if (contacted) {
             timer += delta
+            body.linearVelocity = Vector2.Zero
         }
     }
 

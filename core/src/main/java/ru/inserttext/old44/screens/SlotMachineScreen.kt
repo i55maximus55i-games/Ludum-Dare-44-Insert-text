@@ -3,6 +3,7 @@ package ru.inserttext.old44.screens
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Label
@@ -20,6 +21,8 @@ class SlotMachineScreen : KtxScreen {
     val viewport = FitViewport(1024f, 768f, camera)
 
     var change = false
+    val mDur = 1.2f
+    var mTimer = mDur
 
     val betList = ArrayList<Int>().apply {
         add(10)
@@ -41,10 +44,10 @@ class SlotMachineScreen : KtxScreen {
         fontColor = Color.WHITE
     }
     val labelScore = Label("score = $score", labelStyle).apply {
-        setPosition(0f, 0f)
+        setPosition(336f, 282f)
     }
     val labelBet = Label("bet = ${betList[bet]}", labelStyle).apply {
-        setPosition(0f, 32f)
+        setPosition(336f, 239f)
     }
     val stage = Stage(viewport).apply {
         addActor(labelBet)
@@ -53,6 +56,7 @@ class SlotMachineScreen : KtxScreen {
 
     val texture = Main.assets.getTexture("slots.png")
     val textureMachine = Main.assets.getTexture("m.png")
+    val textureRegion = TextureRegion(textureMachine)
     var slotpos1 = 32f
     var slotpos2 = 32f
     var slotpos3 = 32f
@@ -62,12 +66,14 @@ class SlotMachineScreen : KtxScreen {
     var r1 = 0
     var r2 = 1
     var r3 = 2
-    val r2Chance = 0.5f
-    val r3Chance = 0.8f
+//    val r2Chance = 0.5f
+//    val r3Chance = 0.6f
+    val r2Chance = 0.0f
+    val r3Chance = 0.0f
 
     override fun show() {
 //        var c = 0
-//        val n = 1000
+//        val n = 10000
 //        for (i in 0 .. n) {
 //            r1 = MathUtils.random(0, 2)
 //            r2 = if (MathUtils.random(0f, 1f) > r2Chance) {
@@ -119,6 +125,7 @@ class SlotMachineScreen : KtxScreen {
 
     fun update(delta: Float) {
         slotTimer -= delta
+        mTimer += delta
 
         if (i == 0) {
             if (slotTimer >= 0) {
@@ -206,6 +213,8 @@ class SlotMachineScreen : KtxScreen {
             labelBet.setText("bet = ${betList[bet]}")
 
             if (Main.controls.menuEnter()) {
+                Main.assets.getSound("slot.wav")!!.play()
+                mTimer = 0f
                 i = 0
                 slotTimer = 1f
 
@@ -227,13 +236,16 @@ class SlotMachineScreen : KtxScreen {
     fun draw() {
         batch.projectionMatrix = camera.combined
         batch.use {
-            batch.draw(texture, 338f, slotpos1 + 412)
-            batch.draw(texture, 338f, slotpos1 - 192 + 412)
-            batch.draw(texture, 457f, slotpos2 + 412)
-            batch.draw(texture, 457f, slotpos2 - 192 + 412)
-            batch.draw(texture, 573f, slotpos3 + 412)
-            batch.draw(texture, 573f, slotpos3 - 192 + 412)
-            batch.draw(textureMachine, 0f, 0f)
+            batch.draw(texture, 365f, slotpos1 + 351)
+            batch.draw(texture, 365f, slotpos1 - 192 + 351)
+            batch.draw(texture, 458f, slotpos2 + 351)
+            batch.draw(texture, 458f, slotpos2 - 192 + 351)
+            batch.draw(texture, 552f, slotpos3 + 351)
+            batch.draw(texture, 552f, slotpos3 - 192 + 351)
+
+            val a = if (mTimer > mDur) 0 else (mTimer / (mDur / 7)).toInt()
+            textureRegion.setRegion(1024 * a, 0, 1024, 768)
+            batch.draw(textureRegion, 0f, 0f)
         }
 
         if (Main.debug) {

@@ -35,7 +35,7 @@ class CasinoLoseScreen(val score: Int) : KtxScreen {
                     "Вам придётся участвовать\nв смертельной схватке на арене!", labelStyle)).pad(32f).row()
             add(TextButton(">ЕЕЕ", textButtonStyle).apply {
                 onClick {
-                    Main.setScreen(GameScreen(true), 0.25f, Color.WHITE)
+                    Main.setScreen(SelectWeaponScreen(score), 0.25f, Color.WHITE)
                 }
             })
         })
@@ -54,7 +54,7 @@ class CasinoLoseScreen(val score: Int) : KtxScreen {
         }
 
         if (Main.controls.menuEnter())
-            Main.setScreen(GameScreen(true), 0.25f, Color.WHITE)
+            Main.setScreen(SelectWeaponScreen(score), 0.25f, Color.WHITE)
     }
 
     override fun resize(width: Int, height: Int) {

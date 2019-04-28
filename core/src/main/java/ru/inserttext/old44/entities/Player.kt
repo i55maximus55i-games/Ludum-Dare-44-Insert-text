@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.*
 import ru.inserttext.old44.Main
+import ru.inserttext.old44.screens.GameScreen
 
 class Player(val world: World, position: Vector2, val scale: Float, val shooter: Boolean, val bulletList: ArrayList<Bullet>, val enemyList: ArrayList<Enemy>) {
 
@@ -20,12 +21,12 @@ class Player(val world: World, position: Vector2, val scale: Float, val shooter:
     var animTimer = 0f
     var animShootTimer = 0f
 
-    val attackdst = 1.2f
+    val attackdst = 1.5f
 
     val bulletSize = 16
     val bulletSpeed = 16f
 
-    var hp = 1
+    var hp = 4
     var hitEffect = 0f
 
     init {
@@ -55,7 +56,7 @@ class Player(val world: World, position: Vector2, val scale: Float, val shooter:
                 textureRegion.setRegion(0, 128, 64, 64)
                 batch.draw(textureRegion, body.position.x / scale - textureRegion.regionWidth / 2, body.position.y / scale - textureRegion.regionHeight / 2)
             } else if (hitEffect < 0 || hitEffect % 0.1f > 0.05f) {
-                val h = if (hp == 1 || hp == 2) 0 else 1
+                val h = if (hp == 1 || hp == 2) 1 else 0
                 if (animShootTimer <= animShootDuration) {
                     val t = (animShootTimer / (animShootDuration / 4)).toInt() + 2
                     textureRegion.setRegion(64 * t, 64 * h, 64, 64)
@@ -94,18 +95,20 @@ class Player(val world: World, position: Vector2, val scale: Float, val shooter:
 
     fun shoot() {
         if (shooter) {
+            Main.assets.getSound("shot.wav")!!.play()
+
             bulletList.add(Bullet(world,
-                    body.position.cpy().add(Main.controls.playerShoot().setLength(0.5f)),
+                    body.position.cpy().add(Main.controls.playerShoot().setLength(1f)),
                     Main.controls.playerShoot().setLength(bulletSpeed),
                     bulletSize.toFloat(),
                     bulletSpeed))
             bulletList.add(Bullet(world,
-                    body.position.cpy().add(Main.controls.playerShoot().setLength(0.5f)),
+                    body.position.cpy().add(Main.controls.playerShoot().setLength(1f)),
                     Main.controls.playerShoot().setLength(bulletSpeed).rotate(7f),
                     bulletSize.toFloat(),
                     bulletSpeed))
             bulletList.add(Bullet(world,
-                    body.position.cpy().add(Main.controls.playerShoot().setLength(0.5f)),
+                    body.position.cpy().add(Main.controls.playerShoot().setLength(1f)),
                     Main.controls.playerShoot().setLength(bulletSpeed).rotate(-7f),
                     bulletSize.toFloat(),
                     bulletSpeed))
@@ -116,7 +119,11 @@ class Player(val world: World, position: Vector2, val scale: Float, val shooter:
                     if (i.hp > 0 && i.hitEffect <= 0f) {
                         i.hp--
                         i.hitEffect = 0.5f
+
+                        if (i.hp == 0)
+                            GameScreen.sc += 666
                     }
+                    Main.assets.getSound("hit.wav")!!.play()
                 }
         }
     }

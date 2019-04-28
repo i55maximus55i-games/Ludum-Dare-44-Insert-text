@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import ru.inserttext.old44.controls.Controls
 import ru.inserttext.old44.screens.GameScreen
+import ru.inserttext.old44.screens.MainMenuScreen
 import ru.inserttext.old44.screens.SelectWeaponScreen
 
 class Main(private val isDebug : Boolean) : Game() {
@@ -41,15 +42,23 @@ class Main(private val isDebug : Boolean) : Game() {
     }
 
     override fun create() {
+
         instance = this
         debug = isDebug
         assets = Assets()
         controls = Controls()
         shapeRenderer = ShapeRenderer()
 
+        Main.assets.getMusic("theme.wav").apply {
+            this!!.isLooping = true
+            this.volume = 0.6f
+            this.play()
+        }
+
         //TODO убрать обратно
-//        setScreen(MainMenuScreen())
-        setScreen(SelectWeaponScreen(0))
+        setScreen(MainMenuScreen())
+//        setScreen(SelectWeaponScreen(-5000))
+//        setScreen(SelectWeaponScreen(0))
     }
 
     override fun render() {

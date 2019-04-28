@@ -83,6 +83,7 @@ class EnemyShooter(val world: World, position: Vector2, scale: Float, val bullet
     }
 
     fun shoot(player: Player) {
+        Main.assets.getSound("shot.wav")!!.play()
         bulletList.add(Bullet(world,
                 body.position.cpy().add(player.body.position.cpy().sub(body.position).setLength(1f)),
                 player.body.position.sub(body.position).setLength(bulletSpeed),
