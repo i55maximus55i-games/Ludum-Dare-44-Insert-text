@@ -7,7 +7,7 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.*
 import ru.inserttext.old44.Main
 
-class EnemyShooter(val world: World, position: Vector2, scale: Float) : Enemy(world, position, scale) {
+class EnemyShooter(val world: World, position: Vector2, scale: Float, val bulletList: ArrayList<Bullet>) : Enemy(world, position, scale) {
 
     private val texture = Main.assets.getTexture("enemy1.png")
     val textureRegion = TextureRegion(texture)
@@ -27,8 +27,9 @@ class EnemyShooter(val world: World, position: Vector2, scale: Float) : Enemy(wo
 
     var shootTimer = MathUtils.random(deltaShootMin, deltaShootMax)
 
-    var hp = 2
-    var hitEffect = 0f
+    init {
+        body.fixtureList.last().userData = this
+    }
 
     override fun draw(batch: SpriteBatch) {
         if (texture != null) {
@@ -46,6 +47,10 @@ class EnemyShooter(val world: World, position: Vector2, scale: Float) : Enemy(wo
                     val t = (animTimer / (animDuration / 2)).toInt()
                     textureRegion.setRegion(64 * t, 64 * (2 - hp), 64, 64)
                 }
+                if (body.linearVelocity.x < 0)
+                    textureRegion.flip(false, false)
+                else
+                    textureRegion.flip(true, false)
                 batch.draw(textureRegion, body.position.x / scale - textureRegion.regionWidth / 2, body.position.y / scale - textureRegion.regionHeight / 2)
             }
         }
@@ -78,23 +83,10 @@ class EnemyShooter(val world: World, position: Vector2, scale: Float) : Enemy(wo
     }
 
     fun shoot(player: Player) {
-        val b : Body
-        val bDef = BodyDef()
-        val shape = CircleShape()
-        val fDef = FixtureDef()
-
-        bDef.type = BodyDef.BodyType.DynamicBody
-        bDef.position.set(body.position.cpy().add(player.body.position.cpy().sub(body.position).setLength(1f)))
-
-        b = world.createBody(bDef)
-
-        shape.radius = bulletSize / 2f * Main.scale
-        fDef.shape = shape
-        fDef.friction = 0f
-        fDef.restitution = 0f
-        b.createFixture(fDef)
-        b.userData = "bullet"
-
-        b.linearVelocity = player.body.position.sub(body.position).setLength(bulletSpeed)
+        bulletList.add(Bullet(world,
+                body.position.cpy().add(player.body.position.cpy().sub(body.position).setLength(1f)),
+                player.body.position.sub(body.position).setLength(bulletSpeed),
+                bulletSize.toFloat(),
+                bulletSpeed))
     }
 }

@@ -12,7 +12,7 @@ import ktx.app.KtxScreen
 import ktx.app.clearScreen
 import ru.inserttext.old44.Main
 
-class CasinoLoseScreen : KtxScreen {
+class CasinoLoseScreen(val score: Int) : KtxScreen {
 
     val stage = Stage(ScreenViewport()).apply {
 
@@ -35,7 +35,7 @@ class CasinoLoseScreen : KtxScreen {
                     "Вам придётся участвовать\nв смертельной схватке на арене!", labelStyle)).pad(32f).row()
             add(TextButton(">ЕЕЕ", textButtonStyle).apply {
                 onClick {
-                    Main.setScreen(GameScreen(), 0.25f, Color.WHITE)
+                    Main.setScreen(GameScreen(true), 0.25f, Color.WHITE)
                 }
             })
         })
@@ -54,7 +54,7 @@ class CasinoLoseScreen : KtxScreen {
         }
 
         if (Main.controls.menuEnter())
-            Main.setScreen(GameScreen(), 0.25f, Color.WHITE)
+            Main.setScreen(GameScreen(true), 0.25f, Color.WHITE)
     }
 
     override fun resize(width: Int, height: Int) {

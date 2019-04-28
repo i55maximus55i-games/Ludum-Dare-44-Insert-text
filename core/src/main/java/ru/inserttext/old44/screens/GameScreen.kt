@@ -3,7 +3,6 @@ package ru.inserttext.old44.screens
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.maps.objects.RectangleMapObject
-import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.*
@@ -13,31 +12,36 @@ import ktx.app.use
 import ru.inserttext.old44.ContactHandler
 import ru.inserttext.old44.Main
 import ru.inserttext.old44.Main.Companion.scale
-import ru.inserttext.old44.entities.EnemyClose
+import ru.inserttext.old44.entities.Bullet
+import ru.inserttext.old44.entities.Enemy
 import ru.inserttext.old44.entities.EnemyShooter
 import ru.inserttext.old44.entities.Player
 
-class GameScreen : KtxScreen {
+class GameScreen(val shoot: Boolean) : KtxScreen {
 
     val batch = SpriteBatch()
     val camera = OrthographicCamera()
 
+    val background = Main.assets.getTexture("plitka.png")
     val map = Main.assets.getMap("map1.tmx")
     val world = World(Vector2(), false)
     val box2DDebugRenderer = Box2DDebugRenderer()
     val orthogonalTiledMapRenderer = OrthogonalTiledMapRenderer(map)
 
+    val bulletList = ArrayList<Bullet>()
+    val enemyList = ArrayList<Enemy>()
 
     lateinit var player : Player
-    var enemyShooter = EnemyShooter(world, Vector2(32f, 32f), Main.scale)
 
     override fun show() {
+        enemyList.add(EnemyShooter(world, Vector2(72f, 72f), Main.scale, bulletList))
+
         world.setContactListener(ContactHandler())
         camera.apply {
             setToOrtho(false)
             update()
         }
-        player = Player(world, getPlayerStartPos(),  Main.scale)
+        player = Player(world, getPlayerStartPos(),  Main.scale, shoot, bulletList, enemyList)
         createWalls()
     }
 
@@ -50,7 +54,7 @@ class GameScreen : KtxScreen {
 
     override fun resize(width: Int, height: Int) {
         camera.apply {
-            val a = 680f
+            val a = 300f
             viewportWidth = a * width / height
             viewportHeight = a
             update()
@@ -75,7 +79,10 @@ class GameScreen : KtxScreen {
 
     fun update(delta: Float) {
         player.update(delta)
-        enemyShooter.update(delta, player)
+        for (i in enemyList)
+            i.update(delta, player)
+        for (i in bulletList)
+            i.update(delta)
         world.step(delta, 10, 10)
 
         camera.apply {
@@ -86,12 +93,16 @@ class GameScreen : KtxScreen {
     }
 
     fun draw() {
-        orthogonalTiledMapRenderer.setView(camera)
-        orthogonalTiledMapRenderer.render()
+        batch.use {
+            batch.draw(background, 0f, 0f, 2048f, 2048f)
+        }
         batch.projectionMatrix = camera.combined
         batch.use {
-            enemyShooter.draw(batch)
+            for (i in enemyList)
+                i.draw(batch)
             player.draw(batch)
+            for (i in bulletList)
+                i.draw(batch)
         }
 
         if (Main.debug) {
@@ -105,6 +116,10 @@ class GameScreen : KtxScreen {
             camera.position.y /= scale
             camera.update()
         }
+
+        //TODO включить стены
+//        orthogonalTiledMapRenderer.setView(camera)
+//        orthogonalTiledMapRenderer.render()
     }
 
     fun createWalls() {

@@ -6,8 +6,8 @@ import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import ru.inserttext.old44.controls.Controls
-import ru.inserttext.old44.screens.MainMenuScreen
-import ru.inserttext.old44.screens.SlotMachineScreen
+import ru.inserttext.old44.screens.GameScreen
+import ru.inserttext.old44.screens.SelectWeaponScreen
 
 class Main(private val isDebug : Boolean) : Game() {
 
@@ -47,7 +47,9 @@ class Main(private val isDebug : Boolean) : Game() {
         controls = Controls()
         shapeRenderer = ShapeRenderer()
 
-        setScreen(MainMenuScreen())
+        //TODO убрать обратно
+//        setScreen(MainMenuScreen())
+        setScreen(SelectWeaponScreen(0))
     }
 
     override fun render() {

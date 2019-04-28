@@ -66,24 +66,24 @@ class SlotMachineScreen : KtxScreen {
     val r3Chance = 0.8f
 
     override fun show() {
-        var c = 0
-        val n = 1000
-        for (i in 0 .. n) {
-            r1 = MathUtils.random(0, 2)
-            r2 = if (MathUtils.random(0f, 1f) > r2Chance) {
-                MathUtils.random(0, 2)
-            } else {
-                r1
-            }
-            r3 = if (MathUtils.random(0f, 1f) > r3Chance) {
-                MathUtils.random(0, 2)
-            } else {
-                r2
-            }
-            if (r1 == r2 && r2 == r3)
-                c++
-        }
-        println(c.toFloat() / n.toFloat())
+//        var c = 0
+//        val n = 1000
+//        for (i in 0 .. n) {
+//            r1 = MathUtils.random(0, 2)
+//            r2 = if (MathUtils.random(0f, 1f) > r2Chance) {
+//                MathUtils.random(0, 2)
+//            } else {
+//                r1
+//            }
+//            r3 = if (MathUtils.random(0f, 1f) > r3Chance) {
+//                MathUtils.random(0, 2)
+//            } else {
+//                r2
+//            }
+//            if (r1 == r2 && r2 == r3)
+//                c++
+//        }
+//        println(c.toFloat() / n.toFloat())
     }
 
     override fun render(delta: Float) {
@@ -174,6 +174,16 @@ class SlotMachineScreen : KtxScreen {
                         score -= betList[bet]
                     }
                     labelScore.setText("score = $score")
+                    if (!change) {
+                        if (score < min) {
+                            Main.setScreen(CasinoLoseScreen(score), 0.25f, Color.WHITE)
+                            change = true
+                        }
+                        if (score > goal) {
+                            Main.setScreen(CasinoWinScreen(), 0.25f, Color.WHITE)
+                            change = true
+                        }
+                    }
                 }
                 else {
                     slotpos3 += delta * 512
@@ -210,17 +220,6 @@ class SlotMachineScreen : KtxScreen {
                 } else {
                     r2
                 }
-            }
-        }
-
-        if (!change) {
-            if (score < min) {
-                Main.setScreen(CasinoLoseScreen(), 0.25f, Color.WHITE)
-                change = true
-            }
-            if (score > goal) {
-                Main.setScreen(CasinoWinScreen(), 0.25f, Color.WHITE)
-                change = true
             }
         }
     }

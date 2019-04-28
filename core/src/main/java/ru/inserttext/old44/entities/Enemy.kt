@@ -9,6 +9,9 @@ open class Enemy(world: World, position: Vector2, val scale: Float) {
     val size = 64
     val body : Body
 
+    var hp = 2
+    var hitEffect = 0f
+
     init {
         val bDef = BodyDef()
         val shape = CircleShape()

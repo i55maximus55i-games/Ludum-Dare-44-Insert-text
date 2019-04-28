@@ -31,7 +31,7 @@ class CasinoWinScreen() : KtxScreen {
             center()
 
             add(Label("Поднял бабла, стали другими дела\n" +
-                    "стали считаться со мной, знают кто теперь я,\n" +
+                    "стали считаться со мной,\nзнают кто теперь я,\n" +
                     "машила линию дала!", labelStyle)).pad(32f).row()
             add(TextButton(">ЕЕЕ", textButtonStyle).apply {
                 onClick {

@@ -62,6 +62,24 @@ class Controls {
         return Vector2(x, y).clamp(0f, 1f)
     }
 
+    fun playerShoot(): Vector2 {
+        var x = 0f
+        var y = 0f
+
+        if (isGamePad)
+            for (i in gamepads) {
+                x += i.axis(XboxMapping.R_STICK_HORIZONTAL_AXIS)
+                y -= i.axis(XboxMapping.R_STICK_VERTICAL_AXIS)
+            }
+        else {
+            x = (Gdx.input.x - Gdx.graphics.width / 2).toFloat()
+            y = (Gdx.graphics.height / 2 - Gdx.input.y).toFloat()
+        }
+        if (x == 0f && y == 0f)
+            x = 1f
+        return Vector2(x, y).setLength(1f)
+    }
+
     fun up(): Boolean {
         var t = false
         if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
@@ -89,6 +107,18 @@ class Controls {
     fun menuEnter(): Boolean {
         var t = false
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+            t = true
+        }
+        for (i in gamepads) {
+            if (i.isButtonJustPressed(XboxMapping.A))
+                t = true
+        }
+        return t
+    }
+
+    fun attack(): Boolean {
+        var t = false
+        if (Gdx.input.justTouched()) {
             t = true
         }
         for (i in gamepads) {

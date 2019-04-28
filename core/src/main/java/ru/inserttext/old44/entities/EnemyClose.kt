@@ -9,26 +9,25 @@ import ru.inserttext.old44.Main
 
 class EnemyClose(val world: World, position: Vector2, scale: Float) : Enemy(world, position, scale) {
 
-    //TODO сделать здесь анимацию
-
     private val texture = Main.assets.getTexture("enemy2.png")
     val textureRegion = TextureRegion(texture)
     val animDuration = 0.3f
     var animTimer = 0f
-    val attackAnimDuration = 0.2f
-    val attackAnimTimer = 0f
+    val attackAnimDuration = 1.2f
+    var attackAnimTimer = 0f
 
-    val distanceMin = 1.2f
+    val distanceMin = 0.9f
     val distanceMax = 2f
-    val speedMin = 4f
-    val speedMax = 5f
-    val attackDst = 1.5f
-    val gobackDuration = 0.4f
+    val speedMin = 3.5f
+    val speedMax = 4.5f
+    val attackDst = 1f
+    val gobackDuration = 0.3f
 
     var goBackTimer = 0f
 
-    var hp = 2
-    var hitEffect = 0f
+    init {
+        body.fixtureList.last().userData = this
+    }
 
     override fun draw(batch: SpriteBatch) {
         if (texture != null) {
@@ -46,25 +45,45 @@ class EnemyClose(val world: World, position: Vector2, scale: Float) : Enemy(worl
                     val t = (animTimer / (animDuration / 2)).toInt()
                     textureRegion.setRegion(64 * t, 64 * (2 - hp), 64, 64)
                 }
+                if (body.linearVelocity.x < 0)
+                    textureRegion.flip(true, false)
+                else
+                    textureRegion.flip(false, false)
                 batch.draw(textureRegion, body.position.x / scale - textureRegion.regionWidth / 2, body.position.y / scale - textureRegion.regionHeight / 2)
             }
         }
     }
 
     override fun update(delta: Float, player: Player) {
-        goBackTimer -= delta
-        if (body.position.dst(player.body.position) >= distanceMax) {
-            body.linearVelocity = player.body.position.sub(body.position).setLength(MathUtils.random(speedMin, speedMax))
+        if (hp > 0) {
+            goBackTimer -= delta
+            animTimer += delta
+            animTimer %= animDuration
+            attackAnimTimer += delta
+            hitEffect -= delta
+
+            if (body.position.dst(player.body.position) >= distanceMax) {
+                body.linearVelocity = player.body.position.sub(body.position).setLength(MathUtils.random(speedMin, speedMax))
+            }
+            if (body.position.dst(player.body.position) <= distanceMin) {
+                body.linearVelocity = body.position.sub(player.body.position).setLength(MathUtils.random(speedMin, speedMax))
+            }
+            if (goBackTimer >= 0) {
+                body.linearVelocity = body.position.sub(player.body.position).setLength(MathUtils.random(speedMin, speedMax) * 1.8f)
+            }
+            if (body.position.dst(player.body.position) <= attackDst) {
+                goBackTimer = gobackDuration
+                attackAnimTimer = 0f
+                attatck()
+            }
         }
-        if (body.position.dst(player.body.position) <= distanceMin) {
-            body.linearVelocity = body.position.sub(player.body.position).setLength(MathUtils.random(speedMin, speedMax))
+        else {
+            body.linearVelocity = Vector2.Zero
         }
-        if (goBackTimer >= 0) {
-            body.linearVelocity = body.position.sub(player.body.position).setLength(MathUtils.random(speedMin, speedMax) * 1.8f)
-        }
-        if (body.position.dst(player.body.position) <= attackDst) {
-            goBackTimer = gobackDuration
-        }
+    }
+
+    fun attatck() {
+
     }
 
 }
