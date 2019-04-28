@@ -66,10 +66,10 @@ class SlotMachineScreen : KtxScreen {
     var r1 = 0
     var r2 = 1
     var r3 = 2
-//    val r2Chance = 0.5f
-//    val r3Chance = 0.6f
-    val r2Chance = 0.0f
-    val r3Chance = 0.0f
+    val r2Chance = 0.5f
+    val r3Chance = 0.6f
+//    val r2Chance = 0.0f
+//    val r3Chance = 0.0f
 
     override fun show() {
 //        var c = 0
