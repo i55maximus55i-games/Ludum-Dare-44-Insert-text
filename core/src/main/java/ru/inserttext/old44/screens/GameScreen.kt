@@ -95,7 +95,7 @@ class GameScreen(val shoot: Boolean, val score: Int) : KtxScreen {
 
     override fun resize(width: Int, height: Int) {
         camera.apply {
-            val a = 300f
+            val a = 600f
             viewportWidth = a * width / height
             viewportHeight = a
             update()
